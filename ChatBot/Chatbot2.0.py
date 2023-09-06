@@ -17,7 +17,7 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS offerte
 
 
 i = 1
-
+i1 = 0
 while i > 0:
 
     print("Benvenuto su ChatBOT")
@@ -62,7 +62,7 @@ while i > 0:
                 print("Ecco le offerte disponibili per la modifica:")
                 for row in offerte:
                     id, Nome, Descrizione, Stipendio, Numero_Recruiter = row
-                    print(f"ID: {id} | {Nome} | {Descrizione} | {Stipendio} euro mensili | {Numero_Recruiter}")
+                    print(f"ID: {id} | {Nome} | {Descrizione} | {Stipendio} EuroMensili | {Numero_Recruiter}")
                 
                 print("\n")
 
@@ -104,7 +104,7 @@ while i > 0:
                 print("Ecco le offerte disponibili per l'eliminazione:")
                 for row in offerte:
                     id, Nome, Descrizione, Stipendio, Numero_Recruiter = row
-                    print(f"ID: {id} | {Nome} | {Descrizione} | {Stipendio} euro mensili | {Numero_Recruiter}")
+                    print(f"ID: {id} | {Nome} | {Descrizione} | {Stipendio} EuroMensili | {Numero_Recruiter}")
 
                 print("\n")
                 # Chiedi all'utente di selezionare l'ID dell'offerta da eliminare
@@ -161,7 +161,7 @@ while i > 0:
             # Recupero di tutti i dati e visualizzazione
             for row in cursor.fetchall():
                 id, Nome, Stipendio = row
-                print(f"ID: {id} | {Nome} | {Stipendio} euro mensili")
+                print(f"ID: {id} | {Nome} | {Stipendio} EuroMensili")
             print("\n")
 
             while i > 0:
@@ -179,7 +179,7 @@ while i > 0:
                     offerte = cursor.fetchall()
                     for row in offerte:
                         id, Nome, Descrizione, Stipendio, Numero_Recruiter = row
-                        print(f"ID: {id} | {Nome} | {Descrizione} | {Stipendio} euro mensili | {Numero_Recruiter}")
+                        print(f"ID: {id} | {Nome} | {Descrizione} | {Stipendio} EuroMensili | {Numero_Recruiter}")
                         print("\n")
                 
                 else:
@@ -191,28 +191,36 @@ while i > 0:
             print("\n")
 
             parola = input("Inserisci parametro della tua ricerca: ")
+            l1 = parola.split()
+            x = len(l1)
+            
+            while i1<x:
+                cursor.execute("SELECT * FROM offerte WHERE Nome_Offerta LIKE ? OR Descrizione LIKE ? OR Stipendio LIKE ?", (f"%{l1[i1]}%", f"%{l1[i1]}%", f"%{l1[i1]}%"))
+                offerte = cursor.fetchall()
+                for row in offerte:
+                    id, Nome, Descrizione, Stipendio, Numero_Recruiter = row
+                    print(f"ID: {id} | {Nome} | {Descrizione} | {Stipendio} EuroMensili")
 
-            cursor.execute("SELECT * FROM offerte WHERE Nome_Offerta LIKE ? OR Descrizione LIKE ? OR Stipendio LIKE ?", (f"%{parola}%", f"%{parola}%", f"%{parola}%"))
-            offerte = cursor.fetchall()
-            for row in offerte:
-                id, Nome, Descrizione, Stipendio, Numero_Recruiter = row
-                print(f"ID: {id} | {Nome} | {Descrizione} | {Stipendio} euro mensili")
-
-            print("\n")
-
-            scelta3 = input("Vuoi visualizzare il recapito telefonico? Si - No : ")
-            if scelta3 == "Si":
-
-                cursor.execute("SELECT Numero_Recruiter FROM offerte WHERE Nome_Offerta LIKE ? OR Descrizione LIKE ? OR Stipendio LIKE ?", (f"%{parola}%", f"%{parola}%", f"%{parola}%"))
-                recruiter = cursor.fetchall()
-                for row in recruiter:
-                    Numero_Recruiter = row[0]
-                    print(f"Contatto telefonico del Recruiter: {Numero_Recruiter}")
-
+                print("\n")
+                i1 = i1+1
+            i1 = 0
+            if offerte != {}:
+                scelta3 = input("Vuoi visualizzare il recapito telefonico? Si - No : ")
+                if scelta3 == "Si":
+                    while i1<x:
+                        cursor.execute("SELECT * FROM offerte WHERE Nome_Offerta LIKE ? OR Descrizione LIKE ? OR Stipendio LIKE ?", (f"%{l1[i1]}%", f"%{l1[i1]}%", f"%{l1[i1]}%"))
+                        offerte = cursor.fetchall()
+                        cursor.execute("SELECT Numero_Recruiter FROM offerte WHERE Nome_Offerta LIKE ? OR Descrizione LIKE ? OR Stipendio LIKE ?", (f"%{l1[i1]}%", f"%{l1[i1]}%", f"%{l1[i1]}%"))
+                        recruiter = cursor.fetchall()
+                        for row in recruiter:
+                            Numero_Recruiter = row[0]
+                            print(f"Contatto telefonico del Recruiter: {Numero_Recruiter}")
+                        i1 = i1+1
                     print("\n")
+        
 
-        else:
-            break
+                else:
+                    break
         
     
     elif scelta == "Esci":
