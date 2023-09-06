@@ -15,12 +15,13 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS offerte
                    Numero_Recruiter INTEGER)''')
 
 
-print("Benvenuto su ChatBOT")
-print("\n")
+
 i = 1
 
 while i > 0:
 
+    print("Benvenuto su ChatBOT")
+    print("\n")
     print("DatoreLavoro - Utente - Esci")
     scelta = input("Come vuoi interagire? ")
     
@@ -61,7 +62,7 @@ while i > 0:
                 print("Ecco le offerte disponibili per la modifica:")
                 for row in offerte:
                     id, Nome, Descrizione, Stipendio, Numero_Recruiter = row
-                    print(f"ID: {id} | {Nome} | {Descrizione} | {Stipendio} | {Numero_Recruiter}")
+                    print(f"ID: {id} | {Nome} | {Descrizione} | {Stipendio} euro mensili | {Numero_Recruiter}")
                 
                 print("\n")
 
@@ -103,18 +104,18 @@ while i > 0:
                 print("Ecco le offerte disponibili per l'eliminazione:")
                 for row in offerte:
                     id, Nome, Descrizione, Stipendio, Numero_Recruiter = row
-                    print(f"ID: {id} | {Nome} | {Descrizione} | {Stipendio} | {Numero_Recruiter}")
+                    print(f"ID: {id} | {Nome} | {Descrizione} | {Stipendio} euro mensili | {Numero_Recruiter}")
 
                 print("\n")
                 # Chiedi all'utente di selezionare l'ID dell'offerta da eliminare
-                offerta_da_elimare = input("Inserisci l'ID dell'offerta da eliminare: ")
+                offerta_da_eliminare = input("Inserisci l'ID dell'offerta da eliminare: ")
                 
 
                 # Verifica se l'ID inserito è valido
                 offerta_esistente = False
                 for row in offerte:
                     id, _, _, _, _ = row
-                    if str(id) == offerta_da_elimare:
+                    if str(id) == offerta_da_eliminare:
                         offerta_esistente = True
                         break
 
@@ -122,14 +123,26 @@ while i > 0:
                     print("ID dell'offerta non valido. L'eliminazione non è possibile.")
                 else:
                     # Esegui l'eliminazione dell'offerta selezionata
-                    cursor.execute("DELETE FROM offerte WHERE id=?", (offerta_da_elimare,))
+                    cursor.execute("DELETE FROM offerte WHERE id=?", (offerta_da_eliminare,))
+    
+                    cursor.execute("SELECT id FROM offerte")
+                    rows = cursor.fetchall()
+                    new_id = 1
+
+                    for row in rows:
+                        old_id = row[0]
+                        if old_id != new_id:
+                            cursor.execute("UPDATE offerte SET id=? WHERE id=?", (new_id, old_id))
+                            new_id += 1
 
                     # Salvataggio dei cambiamenti e chiusura della connessione
-                    conn.commit
-                    ()
+                    conn.commit()
+                    
                     print("\n")
                     print("Offerta eliminata con successo.")
                     print("\n")
+
+                    
 
             else:
                 print("Azione non valida.")
@@ -143,14 +156,65 @@ while i > 0:
         print("\n")
 
         if scelta1 == "Visualizza":
-            cursor.execute("SELECT * FROM offerte")
+            cursor.execute("SELECT id, Nome_Offerta, Stipendio FROM offerte")
 
             # Recupero di tutti i dati e visualizzazione
             for row in cursor.fetchall():
+                id, Nome, Stipendio = row
+                print(f"ID: {id} | {Nome} | {Stipendio} euro mensili")
+            print("\n")
+
+            while i > 0:
+
+                scelta2 = input("VisualizzaID - Esci? ")
+
+                if scelta2 == "VisualizzaID":
+                
+                
+                    a = input("Qual è l'id dell'offerta a cui sei interessato? ")
+
+                    print("\n")
+
+                    cursor.execute("SELECT * FROM offerte WHERE id = ?", (a,))
+                    offerte = cursor.fetchall()
+                    for row in offerte:
+                        id, Nome, Descrizione, Stipendio, Numero_Recruiter = row
+                        print(f"ID: {id} | {Nome} | {Descrizione} | {Stipendio} euro mensili | {Numero_Recruiter}")
+                        print("\n")
+                
+                else:
+                    break
+
+
+        elif scelta1 == "Cerca":
+
+            print("\n")
+
+            parola = input("Inserisci parametro della tua ricerca: ")
+
+            cursor.execute("SELECT * FROM offerte WHERE Nome_Offerta LIKE ? OR Descrizione LIKE ? OR Stipendio LIKE ?", (f"%{parola}%", f"%{parola}%", f"%{parola}%"))
+            offerte = cursor.fetchall()
+            for row in offerte:
                 id, Nome, Descrizione, Stipendio, Numero_Recruiter = row
-                print(f"ID: {id} | {Nome} | {Descrizione} | {Stipendio} | {Numero_Recruiter}")
-        print("\n")
+                print(f"ID: {id} | {Nome} | {Descrizione} | {Stipendio} euro mensili")
+
+            print("\n")
+
+            scelta3 = input("Vuoi visualizzare il recapito telefonico? Si - No : ")
+            if scelta3 == "Si":
+
+                cursor.execute("SELECT Numero_Recruiter FROM offerte WHERE Nome_Offerta LIKE ? OR Descrizione LIKE ? OR Stipendio LIKE ?", (f"%{parola}%", f"%{parola}%", f"%{parola}%"))
+                recruiter = cursor.fetchall()
+                for row in recruiter:
+                    Numero_Recruiter = row[0]
+                    print(f"Contatto telefonico del Recruiter: {Numero_Recruiter}")
+
+                    print("\n")
+
+        else:
+            break
         
+    
     elif scelta == "Esci":
         break
 
