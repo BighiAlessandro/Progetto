@@ -1,26 +1,26 @@
-import matplotlib.pyplot as plt
-import numpy as np
-import random  
-import time
+import matplotlib.pyplot as plt # Importazione della libreria utile alla visualizzazione esterna al terminale
+import numpy as np # Importazione libreria utile al riempimento automatico delle tabelle
+import random  # Importazione libreria per riempire le tabelle di 1 in modo casuale
+import time # Importazione libreria utile alla creazione di un delay tra le visualizzazioni
 
-plt.figure()
+plt.figure() # Creazione della forma in cui verra visualizzato l'output
 
 
 righe = int(input("Inserisci il numero di righe della matrice: "))
 colonne = int(input("Inserisci il numero di colonne della matrice: "))
 
 
-tabella=np.zeros((righe,colonne))
-appoggio=np.zeros((righe,colonne))
+tabella=np.zeros((righe,colonne)) # Creazione di un array di tutti zeri
+appoggio=np.zeros((righe,colonne)) # Creazione di un secondo array di appoggio copia del precedente utile a stampare l'output dell'evoluzione senza errori
 totale=righe*colonne
 
-random_vive = int(totale*30/100)
+random_vive = int(totale*30/100) # Inserimento di un numero di 1 che sia pari a circa il 30% delle celle totali dell'array
 
 i = 0
 j = 0
-numvive=0
+numvive=0 # Inizializzazione della variabile di appoggio che permette a tutte le regole di funzionare
 
-posizioniCasuali = np.random.choice(range(totale), random_vive, replace=False)
+posizioniCasuali = np.random.choice(range(totale), random_vive, replace=False) # Scelta delle posizioni casuali in cui inserire gli 1 ed inserimento
 
 for posizione in posizioniCasuali:
     riga, colonna = divmod(posizione, colonne)
@@ -39,8 +39,9 @@ def visualizza_matrice(matrice):
 
 visualizza_matrice(tabella)
 
-#sezione delle funzioni
-def regoleVive():
+# Sezione delle funzioni
+
+def regoleVive(): # Funzione delle regole applicate alla singola cella qualora il valore contenuto fosse 1 
 
     if numvive < 2:
         appoggio[i][j] = 0
@@ -51,7 +52,7 @@ def regoleVive():
     if numvive >= 4 :
         appoggio[i][j] = 0
 
-def regoleMorte():
+def regoleMorte():  # Funzione delle regole applicate alla singola cella qualora il valore contenuto fosse 0 
 
     if numvive == 3:
         appoggio[i][j] = 1
@@ -59,7 +60,7 @@ def regoleMorte():
         appoggio[i][j] = 0
 
 
-def angoloNordOvest():
+def angoloNordOvest(): # Confronti necessari al funzionamento della cella [0][0]
 
     global numvive
 
@@ -77,7 +78,7 @@ def angoloNordOvest():
     else:
         regoleVive()
 
-def angoloNordEst():
+def angoloNordEst(): # Confronti necessari al funzionamento della cella [0][colonne-1]
 
     global numvive
 
@@ -95,7 +96,7 @@ def angoloNordEst():
     else:
         regoleVive()
 
-def angoloSudOvest():
+def angoloSudOvest():   # Confronti necessari al funzionamento della cella [Righe-1][0]
 
     global numvive
 
@@ -113,7 +114,7 @@ def angoloSudOvest():
     else:
         regoleVive()
 
-def angoloSudEst():
+def angoloSudEst(): # Confronti necessari al funzionamento della cella [righe-1][colonne-1]
 
     global numvive
 
@@ -131,7 +132,7 @@ def angoloSudEst():
     else:
         regoleVive()
 
-def latoNord():
+def latoNord(): # Confronti necessari al funzionamento delle celle contenute nella riga 0 esclusi gli angoli
 
     global numvive
 
@@ -155,7 +156,7 @@ def latoNord():
     else:
         regoleVive()
 
-def latoEst():
+def latoEst():  # Confronti necessari al funzionamento delle celle contenute nella colonna "colonne-1" esclusi gli angoli
 
     global numvive
 
@@ -179,7 +180,7 @@ def latoEst():
     else:
         regoleVive()
 
-def latoSud():
+def latoSud():  # Confronti necessari al funzionamento delle celle contenute nella riga "righe-1" esclusi gli angoli
     
     global numvive
 
@@ -203,7 +204,7 @@ def latoSud():
     else:
         regoleVive()
 
-def latoOvest():
+def latoOvest():    # Confronti necessari al funzionamento delle celle contenute nella colonna 0 esclusi gli angoli
     
     global numvive
 
@@ -227,7 +228,7 @@ def latoOvest():
     else:
         regoleVive()
 
-def centrale():
+def centrale(): # Confronti necessari al funzionamento di tutte le celle che non rispettino le precedenti "condizioni particolari"
 
     global numvive
 
@@ -273,10 +274,10 @@ evoluzioni = input("Quante evoluzioni vuoi che ci siano in questa partita?")
 conta=0
 
 
-while conta < int(evoluzioni) :
+while conta < int(evoluzioni) : # Ciclo che determina il riaggiornamento della griglia in base alle condizioni del gioco e in base al numero di aggiornamenti inseriti in input dall'utente
     for i in range(len(tabella)):
       
-        for j in range(len(tabella[0])):
+        for j in range(len(tabella[0])): # Richiamo delle funzioni specificatamente create in base alle particolari posizioni delle celle
             valore = tabella[i][j]
             if (i == 0 and j == 0):
                 angoloNordOvest()
@@ -305,13 +306,13 @@ while conta < int(evoluzioni) :
             else:
                 centrale()
             j=j+1
-            numvive=0
+            numvive=0 # Riporto della variabile numvive a 0 dopo ogni singolo ciclo per prendere in esame le celle vive adiacenti solo alla cella esaminata in quel momento dal ciclo
             
         i=i+1
     
     print(np.array(appoggio))
-    visualizza_matrice(appoggio)
-    time.sleep(delay)
+    visualizza_matrice(appoggio) # Visualizzazione della matrice tramite la libreria matplotlib
+    time.sleep(delay) # Delay impostato per permettere alla libreria matplotlib di attendere 3 secondi prima della visualizzazione dell'immagine legata all'evoluzione successiva
     tabella = appoggio 
     conta=conta+1
 
