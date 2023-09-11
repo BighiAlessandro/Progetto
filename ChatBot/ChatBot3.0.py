@@ -22,18 +22,18 @@ while i > 0:
     print("\n")
     print("DatoreLavoro - Utente - Esci")
     scelta = input("Come vuoi interagire? ")
-    scelta = scelta.upper()
-    if scelta == "DATORELAVORO":
+    scelta = scelta.upper()  #Funzione upper per rendere l'input non case sensitive
+    if scelta == "DATORELAVORO": #Prima opzione switch principale
         print("\n")
         password_inserita = input("Inserisci la password del DatoreLavoro: ")
         
-        if password_inserita == "sasso":
+        if password_inserita == "sasso": #Verifica identità del datore di lavoro tramite inserimento di una password specificata
             print("Accesso consentito. Esegui azione per il caso DatoreLavoro")
             print("\n")
-            print("Operazioni disponibili: Inserisci - Modifica - Elimina")
+            print("Operazioni disponibili: Inserisci - Modifica - Elimina") #Inizio del secondo switch per la selezione delle opzioni possibili per il datore di lavoro
             scelta1 = input("Come vuoi interagire? ")
             scelta1 = scelta1.upper()
-            if scelta1 == "INSERISCI":
+            if scelta1 == "INSERISCI":  #Switch realizzato con if ed elif 
                 # Input dei dati dall'utente
                 print("\n")
                 Nome = input("Per che lavoro vuoi creare un'offerta?: ")
@@ -45,7 +45,7 @@ while i > 0:
                 cursor.execute("INSERT INTO offerte (Nome_Offerta, Descrizione, Stipendio, Numero_Recruiter) VALUES (?, ?, ?, ?)",
                                (Nome, Descrizione, Stipendio, Numero_Recruiter))
 
-                # Salvataggio dei cambiamenti e chiusura della connessione
+                # Salvataggio dei cambiamenti
                 conn.commit()
 
                 print("\n")
@@ -55,10 +55,10 @@ while i > 0:
 
             elif scelta1 == "MODIFICA":
                 # Visualizza tutte le offerte disponibili per la modifica
-                cursor.execute("SELECT * FROM offerte")
+                cursor.execute("SELECT * FROM offerte") #Selezione di tutte le rows contenute nella tabella offerte
                 offerte = cursor.fetchall()
                 print("Ecco le offerte disponibili per la modifica:")
-                for row in offerte:
+                for row in offerte: #Ciclo per la stampa del database
                     id, Nome, Descrizione, Stipendio, Numero_Recruiter = row
                     print(f"ID: {id} | {Nome} | {Descrizione} | {Stipendio} EuroMensili | {Numero_Recruiter}")
                 
@@ -78,7 +78,7 @@ while i > 0:
                 if not offerta_esistente:
                     print("ID dell'offerta non valido. La modifica non è possibile.")
                 else:
-                    # Input dei nuovi dati dall'utente
+                    # Input dei nuovi dati dell'offerta dopo la modifica
                     Nome = input("Inserisci il nuovo nome per l'offerta: ")
                     Descrizione = input("Inserisci la nuova descrizione per l'offerta: ")
                     Stipendio = int(input("Inserisci il nuovo stipendio: "))
@@ -88,7 +88,7 @@ while i > 0:
                     cursor.execute("UPDATE offerte SET Nome_Offerta=?, Descrizione=?, Stipendio=?, Numero_Recruiter=? WHERE id=?",
                                    (Nome, Descrizione, Stipendio, Numero_Recruiter, offerta_da_modificare))
 
-                    # Salvataggio dei cambiamenti e chiusura della connessione
+                    # Salvataggio dei cambiamenti
                     conn.commit()
 
                     print("\n")
@@ -115,8 +115,7 @@ while i > 0:
                     id, _, _, _, _ = row
                     if str(id) == offerta_da_eliminare:
                         offerta_esistente = True
-                        break
-
+                        break   
                 if not offerta_esistente:
                     print("ID dell'offerta non valido. L'eliminazione non è possibile.")
                 else:
@@ -124,16 +123,16 @@ while i > 0:
                     cursor.execute("DELETE FROM offerte WHERE id=?", (offerta_da_eliminare,))
     
                     cursor.execute("SELECT id FROM offerte")
-                    rows = cursor.fetchall()
+                    rows = cursor.fetchall() #il cursore seleziona tutte le righe del database
                     new_id = 1
-
+                    # Algoritmo di ordinamento per l'aggiornamento degli id del database
                     for row in rows:
                         old_id = row[0]
                         if old_id != new_id:
                             cursor.execute("UPDATE offerte SET id=? WHERE id=?", (new_id, old_id))
                             new_id += 1
 
-                    # Salvataggio dei cambiamenti e chiusura della connessione
+                    # Salvataggio dei cambiamenti
                     conn.commit()
                     
                     print("\n")
@@ -146,6 +145,7 @@ while i > 0:
             print("Password errata. Accesso negato.")
     
     elif scelta == "UTENTE":
+        # Seleziona la categoria utente per utilizzarne le funzionalità
         print("\n")
         print("Opzioni disponibili: Visualizza - Cerca - Esci")
         scelta1 = input("Come vuoi interagire? ")
@@ -161,7 +161,7 @@ while i > 0:
             print("\n")
 
             while i > 0:
-
+                # Visualizzazioen tramite id delle offerte
                 scelta2 = input("VisualizzaID - Esci? ")
                 scelta2 = scelta2.upper()
                 if scelta2 == "VISUALIZZAID":
@@ -173,7 +173,7 @@ while i > 0:
 
                     cursor.execute("SELECT * FROM offerte WHERE id = ?", (a,))
                     offerte = cursor.fetchall()
-                    for row in offerte:
+                    for row in offerte: # Stampa dell'offerta con id inserito da input
                         id, Nome, Descrizione, Stipendio, Numero_Recruiter = row
                         print(f"ID: {id} | {Nome} | {Descrizione} | {Stipendio} EuroMensili | {Numero_Recruiter}")
                         print("\n")
@@ -183,15 +183,15 @@ while i > 0:
 
 
         elif scelta1 == "CERCA":
-
+            # Funzione di ricerca nel database tramite piu parole chiave
             print("\n")
 
-            parola = input("Inserisci parametro della tua ricerca: ")
-            l1 = parola.split()
+            parola = input("Inserisci parametro della tua ricerca: ") # Inserimento da input di uno o più parametri di ricerca
+            l1 = parola.split() # Divisione dei singoli parametri di ricerca in diverse celle di un array
             x = len(l1)
             
             while i1<x:
-                cursor.execute("SELECT * FROM offerte WHERE Nome_Offerta LIKE ? OR Descrizione LIKE ? OR Stipendio LIKE ?", (f"%{l1[i1]}%", f"%{l1[i1]}%", f"%{l1[i1]}%"))
+                cursor.execute("SELECT * FROM offerte WHERE Nome_Offerta LIKE ? OR Descrizione LIKE ? OR Stipendio LIKE ?", (f"%{l1[i1]}%", f"%{l1[i1]}%", f"%{l1[i1]}%")) #selezione delle rows del database in cui è presente almeno uno dei parametri in almeno una delle celle
                 offerte = cursor.fetchall()
                 for row in offerte:
                     id, Nome, Descrizione, Stipendio, Numero_Recruiter = row
@@ -200,7 +200,7 @@ while i > 0:
                 print("\n")
                 i1 = i1+1
             i1 = 0
-            if offerte != {}:
+            if offerte != {}: # Se è stata trovata almeno un'offerta che rispetti i parametri
                 scelta3 = input("Vuoi visualizzare il recapito telefonico? Si - No : ")
                 scelta3 = scelta3.upper()
                 if scelta3 == "SI":
@@ -219,7 +219,7 @@ while i > 0:
                     break
         
     
-    elif scelta == "ESCI":
+    elif scelta == "ESCI": # Ultima opzione dello switch di selezione principale "DatoreLavoro - Utente - Esci"
         break
 
-conn.close()
+conn.close() # Chiusura della connessione del database
